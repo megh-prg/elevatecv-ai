@@ -1,3 +1,4 @@
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
 
@@ -10,8 +11,17 @@ class MongoDB:
         self.db = None
 
     async def connect(self) -> None:
-        self.client = AsyncIOMotorClient(self.uri)
+        self.client = AsyncIOMotorClient(
+            self.uri,
+            tls=True,
+            tlsCAFile=certifi.where(),
+            tlsAllowInvalidCertificates=False,
+            serverSelectionTimeoutMS=5000,
+            connectTimeoutMS=10000,
+            socketTimeoutMS=45000,
+        )
         self.db = self.client[self.db_name]
+
 
     async def close(self) -> None:
         if self.client:

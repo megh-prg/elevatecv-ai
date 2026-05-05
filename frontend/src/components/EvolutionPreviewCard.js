@@ -1,4 +1,7 @@
-export default function EvolutionPreviewCard() {
+export default function EvolutionPreviewCard({ originalText, optimizedText }) {
+  const displayOriginal = originalText ? originalText.substring(0, 120) + '...' : '"Responsible for managing the frontend team and delivering multiple projects on time."';
+  const displayOptimized = optimizedText ? optimizedText.substring(0, 150) + (optimizedText.length > 150 ? '...' : '') : '"Spearheaded a 5-member frontend engineering team, accelerating project delivery by 40% through Agile transformation."';
+
   return (
     <div className="rounded-[2rem] border border-white/10 bg-surface-container p-8 shadow-glow">
       <div className="flex items-center justify-between mb-6">
@@ -17,7 +20,7 @@ export default function EvolutionPreviewCard() {
             <div className="h-3 w-full rounded-full bg-surface-variant" />
             <div className="h-3 w-5/6 rounded-full bg-surface-variant" />
             <div className="h-20 rounded-3xl bg-surface-variant" />
-            <p className="text-sm leading-relaxed text-on-surface-variant">"Responsible for managing the frontend team and delivering multiple projects on time."</p>
+            <p className="text-sm leading-relaxed text-on-surface-variant">{displayOriginal}</p>
           </div>
         </div>
         <div className="space-y-4 rounded-3xl border border-white/5 bg-[#101a34] p-5">
@@ -28,7 +31,7 @@ export default function EvolutionPreviewCard() {
             <div className="h-3 w-5/6 rounded-full bg-primary/20" />
             <div className="h-20 rounded-3xl bg-primary/20" />
             <div className="rounded-3xl border-l-4 border-primary/40 bg-primary/10 p-4">
-              <p className="text-sm leading-relaxed italic text-on-surface">"Spearheaded a 5-member frontend engineering team, accelerating project delivery by 40% through Agile transformation."</p>
+              <p className="text-sm leading-relaxed italic text-on-surface">{displayOptimized}</p>
             </div>
           </div>
         </div>

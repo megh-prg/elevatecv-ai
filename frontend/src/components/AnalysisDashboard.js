@@ -17,9 +17,53 @@ export default function AnalysisDashboard({ onBack }) {
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState(null);
   const [statusMessage, setStatusMessage] = useState('Upload a resume to get started.');
+  
+  const [matchedSkills, setMatchedSkills] = useState([]);
+  const [missingSkills, setMissingSkills] = useState([]);
+  const [atsScore, setAtsScore] = useState(0);
+  const [confidence, setConfidence] = useState(0);
 
-  const matchedSkills = ['React.js', 'TypeScript', 'Tailwind CSS', 'Figma'];
-  const missingSkills = ['GraphQL', 'Next.js 14', 'Unit Testing'];
+  const getResumeMatches = (resume, keywords) => {
+    const normalizedResume = (resume || '').toLowerCase();
+    return (keywords || []).filter((keyword) =>
+      normalizedResume.includes(keyword.toLowerCase())
+    );
+  };
+
+  const updateAnalysisResult = (result, currentResumeText = resumeText) => {
+    const matched = getResumeMatches(currentResumeText, result.keywords || []);
+    const missing = (result.keywords || []).filter((keyword) => !matched.includes(keyword));
+    const roleSummary = result.roles?.length ? result.roles.join(', ') : 'No roles detected.';
+
+    setMatchedSkills(matched);
+    setMissingSkills(missing);
+    
+    // Calculate a preliminary ATS score based on keyword match
+    const keywordScore = result.keywords?.length 
+      ? Math.round((matched.length / result.keywords.length) * 100) 
+      : 0;
+    
+    // Preliminary score (base 40 + keyword match influence)
+    const preliminaryScore = result.keywords?.length 
+      ? Math.min(100, 40 + (keywordScore * 0.6))
+      : 40;
+      
+    setAtsScore(preliminaryScore);
+    setConfidence(keywordScore > 70 ? 85 : 65);
+
+    setOutput({
+      summary: matched.length
+        ? `Your resume matches ${matched.length} of ${result.keywords.length} target keywords.`
+        : 'Your resume does not currently match any of the identified job keywords.',
+      recommendations: [
+        matched.length
+          ? `Good job! Your resume already includes: ${matched.join(', ')}.`
+          : 'Your resume needs more role-specific and technical keyword coverage.',
+        `Missing keywords: ${missing.length ? missing.join(', ') : 'None — your resume already covers the detected terms.'}`,
+        `Emphasize experience relevant to: ${roleSummary}`,
+      ],
+    });
+  };
 
   const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
@@ -38,8 +82,17 @@ export default function AnalysisDashboard({ onBack }) {
 
     try {
       const result = await uploadResume(file);
-      setResumeText(result.text || 'Resume text extracted successfully.');
-      setStatusMessage('Resume uploaded and text extracted successfully.');
+      const uploadedText = result.text || 'Resume text extracted successfully.';
+      setResumeText(uploadedText);
+
+      if (jobDescription.trim()) {
+        setStatusMessage('Analyzing job description after upload...');
+        const analysisResult = await analyzeJobDescription(jobDescription);
+        updateAnalysisResult(analysisResult, uploadedText);
+        setStatusMessage('Resume uploaded and job description analyzed successfully.');
+      } else {
+        setStatusMessage('Resume uploaded. Paste a job description to analyze match.');
+      }
     } catch (error) {
       setUploadError(error.message || 'Resume upload failed.');
       setStatusMessage('Upload failed. Please try again.');
@@ -58,16 +111,7 @@ export default function AnalysisDashboard({ onBack }) {
     setStatusMessage('Analyzing job description...');
     try {
       const result = await analyzeJobDescription(jobDescription);
-      const keywordSummary = result.keywords?.length ? result.keywords.join(', ') : 'No keywords detected.';
-      const roleSummary = result.roles?.length ? result.roles.join(', ') : 'No roles detected.';
-
-      setOutput({
-        summary: `Found ${result.keywords?.length ?? 0} key terms and ${result.roles?.length ?? 0} role matches.`,
-        recommendations: [
-          `Match your resume language to these keywords: ${keywordSummary}`,
-          `Emphasize experience relevant to: ${roleSummary}`,
-        ],
-      });
+      updateAnalysisResult(result, resumeText);
       setStatusMessage('Job description analyzed successfully.');
     } catch (error) {
       setStatusMessage(error.message || 'Analysis failed.');
@@ -92,6 +136,12 @@ export default function AnalysisDashboard({ onBack }) {
     try {
       const result = await optimizeResume(resumeText, jobDescription);
       const optimizedResume = result.optimized_resume || {};
+      
+      setAtsScore(result.score_after || 0);
+      setMatchedSkills(result.matched_keywords || []);
+      setMissingSkills(result.missing_keywords || []);
+      setConfidence(result.score_after > 70 ? 92 : 85);
+
       const recommendations = [
         `Score improvement: ${result.score_after?.toFixed(1) || 'N/A'}%`,
         ...(optimizedResume.skills?.length ? optimizedResume.skills : ['Use clearer metrics and action-focused language.']),
@@ -116,7 +166,12 @@ export default function AnalysisDashboard({ onBack }) {
     setJobDescription('');
     setOutput(null);
     setStatusMessage('Upload a resume to get started.');
+    setMatchedSkills([]);
+    setMissingSkills([]);
+    setAtsScore(0);
+    setConfidence(0);
   };
+
 
   return (
     <div className="min-h-screen bg-[#060e20] text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
@@ -151,8 +206,17 @@ export default function AnalysisDashboard({ onBack }) {
                   onFileChange={handleFileChange}
                   loading={loading}
                 />
-                <DashboardCards />
+                <DashboardCards atsScore={atsScore} confidence={confidence} />
               </div>
+
+              {resumeText && (
+                <div className="rounded-[2rem] border border-white/10 bg-surface-container p-6 shadow-glow">
+                  <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary mb-3">Uploaded Resume Text</p>
+                  <div className="max-h-48 overflow-auto rounded-[1.25rem] border border-white/10 bg-[#091728] p-4 text-sm text-on-surface-variant whitespace-pre-wrap">
+                    {resumeText}
+                  </div>
+                </div>
+              )}
 
               <div className="grid gap-6 xl:grid-cols-[0.9fr_1fr]">
                 <JobDescriptionCard
@@ -166,8 +230,16 @@ export default function AnalysisDashboard({ onBack }) {
             </div>
 
             <div className="space-y-6">
-              <AISuggestionsCard onOptimize={handleOptimize} onReset={handleReset} loading={loading} />
-              <EvolutionPreviewCard />
+              <AISuggestionsCard 
+                suggestions={output?.recommendations?.map((rec, i) => ({ title: `Suggestion ${i+1}`, description: rec })) || []}
+                onOptimize={handleOptimize} 
+                onReset={handleReset} 
+                loading={loading} 
+              />
+              <EvolutionPreviewCard 
+                originalText={resumeText} 
+                optimizedText={output?.summary} 
+              />
               <div className="rounded-[2rem] border border-white/10 bg-surface-container p-8 shadow-glow">
                 <div className="flex items-center justify-between">
                   <div>

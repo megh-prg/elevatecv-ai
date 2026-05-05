@@ -1,20 +1,22 @@
-const suggestions = [
-  { title: 'Impact Metrics', description: 'Quantify your achievements in the Experience section. Use numbers.' },
-  { title: 'Keyword Optimization', description: 'Incorporate cloud-native architecture and leadership language carefully.' },
-  { title: 'Layout Check', description: 'Simplify your header and keep social links minimal for ATS readability.' },
-  { title: 'Action Verbs', description: 'Replace passive wording with strong action verbs like led, launched, and scaled.' },
-];
-
-export default function AISuggestionsCard({ onOptimize, onReset, loading }) {
+export default function AISuggestionsCard({ suggestions = [], onOptimize, onReset, loading }) {
+  const displaySuggestions = suggestions.length ? suggestions : [
+    { title: 'Impact Metrics', description: 'Quantify your achievements in the Experience section. Use numbers.' },
+    { title: 'Keyword Optimization', description: 'Incorporate cloud-native architecture and leadership language carefully.' },
+    { title: 'Layout Check', description: 'Simplify your header and keep social links minimal for ATS readability.' },
+    { title: 'Action Verbs', description: 'Replace passive wording with strong action verbs like led, launched, and scaled.' },
+  ];
   return (
     <div className="rounded-[2rem] border border-white/10 bg-surface-container-high p-8 shadow-glow">
       <div className="flex items-center gap-3 mb-6 text-on-surface">
         <span className="material-symbols-outlined text-primary">auto_awesome</span>
-        <h3 className="text-xs font-semibold uppercase tracking-[0.32em]">AI Insights</h3>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.32em]">AI Optimization</h3>
+          <p className="text-[10px] text-on-surface-variant">Optimize your resume to improve ATS score and keyword coverage.</p>
+        </div>
       </div>
       <div className="space-y-4">
-        {suggestions.map((item) => (
-          <div key={item.title} className="rounded-3xl border border-primary/10 bg-surface-container-lowest p-4 transition hover:-translate-x-1 hover:border-primary/20">
+        {displaySuggestions.map((item, index) => (
+          <div key={index} className="rounded-3xl border border-primary/10 bg-surface-container-lowest p-4 transition hover:-translate-x-1 hover:border-primary/20">
             <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary mb-2">{item.title}</p>
             <p className="text-sm text-on-surface-variant leading-relaxed">{item.description}</p>
           </div>
@@ -26,7 +28,7 @@ export default function AISuggestionsCard({ onOptimize, onReset, loading }) {
           disabled={loading}
           className="w-full rounded-3xl bg-primary px-5 py-4 text-sm font-black uppercase tracking-[0.24em] text-[#060e20] transition hover:brightness-110 disabled:opacity-60"
         >
-          Optimize Resume
+          Optimize Resume (ATS + AI)
         </button>
         <button
           onClick={onReset}

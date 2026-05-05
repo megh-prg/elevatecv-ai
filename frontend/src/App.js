@@ -9,8 +9,7 @@ function LandingPage({ onOpenDashboard }) {
           <span className="text-2xl font-black tracking-tighter text-[#dee5ff] font-['Inter']">ResumeAI</span>
           <div className="hidden md:flex items-center gap-8">
             <a className="text-[#ba9eff] font-bold border-b-2 border-[#ba9eff] pb-1 font-['Inter'] tracking-tight" href="#features">Features</a>
-            <a className="text-[#dee5ff]/70 hover:text-[#dee5ff] transition-colors font-['Inter'] tracking-tight" href="#testimonials">Testimonials</a>
-            <a className="text-[#dee5ff]/70 hover:text-[#dee5ff] transition-colors font-['Inter'] tracking-tight" href="#pricing">Pricing</a>
+
             <button
               type="button"
               onClick={onOpenDashboard}
@@ -27,7 +26,9 @@ function LandingPage({ onOpenDashboard }) {
             >
               View Analysis
             </button>
-            <button className="bg-surface-container-highest/40 hover:bg-surface-container-highest/60 transition-all text-on-surface px-6 py-2.5 rounded-full font-bold">
+            <button
+              onClick={onOpenDashboard}
+              className="bg-surface-container-highest/40 hover:bg-surface-container-highest/60 transition-all text-on-surface px-6 py-2.5 rounded-full font-bold">
               Get Started
             </button>
           </div>
@@ -45,11 +46,11 @@ function LandingPage({ onOpenDashboard }) {
                 Architecture for your professional narrative. Powered by AI. Precision-engineered for modern talent.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button className="cta-gradient text-on-primary px-8 py-4 rounded-xl text-lg font-bold shadow-[0_0_40px_-10px_rgba(186,158,255,0.5)] hover:shadow-[0_0_50px_-5px_rgba(186,158,255,0.6)] transition-all flex items-center gap-2">
+                <button onClick={onOpenDashboard} className="cta-gradient text-on-primary px-8 py-4 rounded-xl text-lg font-bold shadow-[0_0_40px_-10px_rgba(186,158,255,0.5)] hover:shadow-[0_0_50px_-5px_rgba(186,158,255,0.6)] transition-all flex items-center gap-2">
                   <span className="material-symbols-outlined">upload_file</span>
                   Upload Resume
                 </button>
-                <button className="bg-surface-container-highest/40 backdrop-blur-md px-8 py-4 rounded-xl text-lg font-bold border border-outline-variant/20 hover:bg-surface-container-highest/60 transition-all">
+                <button onClick={onOpenDashboard} className="bg-surface-container-highest/40 backdrop-blur-md px-8 py-4 rounded-xl text-lg font-bold border border-outline-variant/20 hover:bg-surface-container-highest/60 transition-all">
                   View Demo
                 </button>
               </div>
@@ -126,151 +127,14 @@ function LandingPage({ onOpenDashboard }) {
           </div>
         </section>
 
-        <section id="testimonials" className="py-24 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-              <div>
-                <span className="text-primary font-label uppercase tracking-widest text-xs mb-2 block">Success Stories</span>
-                <h2 className="text-3xl md:text-5xl font-black text-on-background">Trusted by Industry Leads</h2>
-              </div>
-              <div className="flex gap-4">
-                <div className="h-[1px] w-32 bg-outline-variant/30 mb-2"></div>
-              </div>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-surface-container p-8 rounded-lg relative">
-                <span className="text-6xl absolute top-4 right-4 text-primary/10 font-black italic">"</span>
-                <div className="flex items-center gap-4 mb-6">
-                  <img alt="Portrait of a software engineer in a modern workspace" className="w-12 h-12 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwKwvbwKvgCDsnqS40nf8QPp4dtwvI161fZZ2lRJJUgKFHrAxq6JrEzxeHUMwuayaxNVF_BESfZtEaLmpCwTVT2cb6kP_yp5HF44F9yLgsZZd9-eUAs3VYQRB-_2S4gnVlqJVupoj3DpKfE9o4Q6YKoqXl6Mt8du6NYhRqBR2XuQH0gSMrfs7-ovLBPyA-uY04WY_bWkan39LAUa6fWN9snXQ2Z9yHwXGMdtwAitxdkKrjxZxqgQzWmsEB51mIGf6XRvKzHnQ9Q5tl" />
-                  <div>
-                    <h4 className="font-bold text-on-surface">Alex Rivera</h4>
-                    <p className="text-xs text-on-surface-variant uppercase">Senior Dev at Vercel</p>
-                  </div>
-                </div>
-                <p className="text-on-surface-variant leading-relaxed italic">"ResumeAI helped me reframe my backend experience into a story that FAANG recruiters actually wanted to read. I had 3 interviews in a week."</p>
-              </div>
-              <div className="bg-surface-container p-8 rounded-lg relative">
-                <span className="text-6xl absolute top-4 right-4 text-primary/10 font-black italic">"</span>
-                <div className="flex items-center gap-4 mb-6">
-                  <img alt="Portrait of a female engineering manager in a brightly lit studio" className="w-12 h-12 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8qczX8Dklmk7Naia1RWmZKOJH5zzvuSq99KQD0Ez2yH19KG8m9mpzqAy-eqJCAS0TUi4S_Qw2jzPLxbhclMDqwXnhAzb9HH_0_qOjFRqJA9QDhrRDSyTSMC07Od5QoehjdX-Ki8Q1Gqm-8i_7VlEWb_O0aHd1yx7h8-dt9se-eJCF-hsImFk0HKRnfsT-CFgo1Y-0QXun5MDhsL7puOXR6qXYd5767iZh113Tld5P_o89vUnAtqH-zwGowyBnFhE5nH6YAmFq_TNo" />
-                  <div>
-                    <h4 className="font-bold text-on-surface">Sarah Chen</h4>
-                    <p className="text-xs text-on-surface-variant uppercase">Eng Manager at Stripe</p>
-                  </div>
-                </div>
-                <p className="text-on-surface-variant leading-relaxed italic">"The JD matching is uncanny. It caught missing technologies that I actually knew but forgot to mention. A game changer for job seekers."</p>
-              </div>
-              <div className="bg-surface-container p-8 rounded-lg relative">
-                <span className="text-6xl absolute top-4 right-4 text-primary/10 font-black italic">"</span>
-                <div className="flex items-center gap-4 mb-6">
-                  <img alt="Portrait of a young creative developer" className="w-12 h-12 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXVRjvcfmtyCBDAx9CwdviJaZsnhsCEIK7fS9w2cE_fWDdQzHljuF48ybmaDORKQarw9JQTfk2bEGULKkhn6guAnkam3kT_HVYQiXpLl3tqKhAu3Vd4qXBNwkCavVeUvSo28yKq1yyxlbD-f4BaTkwnuLroFjoCaXuiT3aw_Tjo1nwWSVcFQ0j0Ag0FtefFDwyOT_IKHMLKqYr-11ojzNkirb2RYw7gDIT6uPRlb6ACrMQFTl9lqWSRxTuW6hJO73xFM6kKPajrQtQ" />
-                  <div>
-                    <h4 className="font-bold text-on-surface">Jordan Blake</h4>
-                    <p className="text-xs text-on-surface-variant uppercase">Product Designer at Figma</p>
-                  </div>
-                </div>
-                <p className="text-on-surface-variant leading-relaxed italic">"The editorial feel of the suggestions is what sets it apart. It doesn't sound like a bot wrote it; it sounds like a senior mentor polished it."</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        <section id="pricing" className="py-24 bg-[#060e20]">
-          <div className="max-w-7xl mx-auto px-8">
-            <div className="text-center mb-20">
-              <h2 className="text-3xl md:text-5xl font-black text-on-background mb-4">Architect Your Career</h2>
-              <p className="text-on-surface-variant">Plans that scale with your professional growth.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 items-stretch">
-              <div className="surface-container-low p-10 rounded-lg flex flex-col border border-outline-variant/10">
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-on-surface mb-2">Free</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-on-background">$0</span>
-                    <span className="text-on-surface-variant">/mo</span>
-                  </div>
-                </div>
-                <ul className="space-y-4 mb-10 flex-grow">
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    3 Resume Scans
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    Basic ATS Analysis
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    PDF Export
-                  </li>
-                </ul>
-                <button className="w-full py-4 rounded-xl font-bold border border-outline-variant hover:bg-surface-container-highest transition-all">Get Started</button>
-              </div>
-
-              <div className="surface-container p-10 rounded-lg flex flex-col pro-border shadow-[0_0_60px_-15px_rgba(186,158,255,0.3)] relative transform scale-105 z-10">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary px-4 py-1 rounded-full text-on-primary text-[10px] font-black uppercase tracking-widest">Best Value</div>
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-primary mb-2">Pro</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-on-background">$19</span>
-                    <span className="text-on-surface-variant">/mo</span>
-                  </div>
-                </div>
-                <ul className="space-y-4 mb-10 flex-grow">
-                  <li className="flex items-center gap-3 text-on-surface">
-                    <span className="material-symbols-outlined text-primary text-sm" data-icon="check_circle" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    Unlimited AI Optimization
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface">
-                    <span className="material-symbols-outlined text-primary text-sm" data-icon="check_circle" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    JD-Matching Engine
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface">
-                    <span className="material-symbols-outlined text-primary text-sm" data-icon="check_circle" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    Network Priority Access
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface">
-                    <span className="material-symbols-outlined text-primary text-sm" data-icon="check_circle" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                    Custom Domain Link
-                  </li>
-                </ul>
-                <button className="w-full py-4 rounded-xl font-bold cta-gradient text-on-primary shadow-[0_10px_30px_-5px_rgba(186,158,255,0.4)] hover:scale-[1.02] transition-all">Upgrade to Pro</button>
-              </div>
-
-              <div className="surface-container-low p-10 rounded-lg flex flex-col border border-outline-variant/10">
-                <div className="mb-8">
-                  <h3 className="text-xl font-bold text-on-surface mb-2">Team</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-on-background">$49</span>
-                    <span className="text-on-surface-variant">/mo</span>
-                  </div>
-                </div>
-                <ul className="space-y-4 mb-10 flex-grow">
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    10 User Licenses
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    Shared Asset Library
-                  </li>
-                  <li className="flex items-center gap-3 text-on-surface-variant">
-                    <span className="material-symbols-outlined text-secondary text-sm" data-icon="check_circle">check_circle</span>
-                    Hiring Dashboard
-                  </li>
-                </ul>
-                <button className="w-full py-4 rounded-xl font-bold border border-outline-variant hover:bg-surface-container-highest transition-all">Contact Sales</button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer className="bg-[#060e20] w-full py-12 border-t border-[#40485d]/20">
         <div className="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto space-y-4 md:space-y-0">
           <div className="flex flex-col md:items-start items-center">
             <span className="text-lg font-bold text-[#dee5ff]">ResumeAI</span>
-            <p className="text-[#dee5ff]/50 font-['Inter'] text-sm uppercase tracking-widest mt-2">© 2024 ResumeAI. Crafted by The Ethereal Architect.</p>
+            <p className="text-[#dee5ff]/50 font-['Inter'] text-sm uppercase tracking-widest mt-2">© 2026 ResumeAI. Crafted by The Ethereal Architect.</p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
             <a className="text-[#dee5ff]/50 hover:text-[#ba9eff] transition-colors font-['Inter'] text-sm uppercase tracking-widest" href="#privacy-policy">Privacy Policy</a>

@@ -8,7 +8,14 @@ export async function uploadResume(file) {
     method: 'POST',
     body: formData,
   });
-  const data = await response.json();
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (error) {
+    throw new Error(response.statusText || 'Upload failed');
+  }
+
   if (!response.ok) {
     throw new Error(data.detail || 'Upload failed');
   }

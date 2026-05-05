@@ -16,6 +16,7 @@ class JDAnalysisResponse(BaseModel):
 class OptimizeResponse(BaseModel):
     score_before: float
     score_after: float
+    matched_keywords: List[str]
     missing_keywords: List[str]
     optimized_resume: dict
     version_id: str

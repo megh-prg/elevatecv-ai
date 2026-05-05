@@ -37,18 +37,24 @@ async def health_check() -> dict:
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_resume(request: Request, file: UploadFile = File(...)) -> UploadResponse:
-    db = request.app.state.mongo.db
+    db = request.app.state.mongo.db if request.app.state.mongo else None
     try:
         text = await extract_text_from_file(file)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     
-    await db.resumes.insert_one({
-        "filename": file.filename,
-        "text": text,
-        "created_at": datetime.utcnow()
-    })
+    if db is not None:
+        try:
+            await db.resumes.insert_one({
+                "filename": file.filename,
+                "text": text,
+                "created_at": datetime.utcnow()
+            })
+        except Exception as exc:
+            logger.warning("MongoDB unavailable during upload, skipping persistence: %s", exc)
+
     return UploadResponse(text=text)
+
 
 
 @router.post("/analyze", response_model=JDAnalysisResponse)
@@ -62,7 +68,7 @@ async def optimize_resume_endpoint(
     payload: OptimizeRequest,
     request: Request,
 ) -> OptimizeResponse:
-    db = request.app.state.mongo.db
+    db = request.app.state.mongo.db if request.app.state.mongo else None
     redis_client = request.app.state.redis
 
     job_info = await analyze_job_description(payload.job_description, redis_client)
@@ -95,51 +101,65 @@ async def optimize_resume_endpoint(
         ],
         "created_at": datetime.utcnow(),
     }
-    resume_result = await db.resumes.insert_one(resume_doc)
-
-    job_result = await db.jobs.insert_one(
-        {
-            "jd_text": payload.job_description,
-            "keywords": job_info["keywords"],
-            "created_at": datetime.utcnow(),
-        }
-    )
-
-    analysis_doc = {
-        "resume_id": str(resume_result.inserted_id),
-        "job_id": str(job_result.inserted_id),
-        "score_before": score_before_result["score"],
-        "score_after": score_after_result["score"],
-        "missing_keywords": score_after_result["missing_keywords"],
-        "suggestions": [
-            "Add missing keywords naturally.",
-            "Structure experience with bullet points.",
-            "Keep the tone factual and ATS-friendly.",
-        ],
-        "created_at": datetime.utcnow(),
-    }
-    analysis_result = await db.analyses.insert_one(analysis_doc)
-
-    if payload.async_queue and optimize_resume_task is not None:
+    
+    # Try to save to database, but don't fail if MongoDB is unavailable
+    resume_id = str(uuid.uuid4())
+    job_id = str(uuid.uuid4())
+    analysis_id = str(uuid.uuid4())
+    
+    if db is not None:
         try:
-            optimize_resume_task.delay(
-                payload.resume_text,
-                payload.job_description,
-                str(resume_result.inserted_id),
-                str(job_result.inserted_id),
-                str(analysis_result.inserted_id),
+            resume_result = await db.resumes.insert_one(resume_doc)
+            resume_id = str(resume_result.inserted_id)
+            
+            job_result = await db.jobs.insert_one(
+                {
+                    "jd_text": payload.job_description,
+                    "keywords": job_info["keywords"],
+                    "created_at": datetime.utcnow(),
+                }
             )
-        except Exception:
-            logger.warning("Failed to enqueue background optimization job")
+            job_id = str(job_result.inserted_id)
+
+            analysis_doc = {
+                "resume_id": resume_id,
+                "job_id": job_id,
+                "score_before": score_before_result["score"],
+                "score_after": score_after_result["score"],
+                "missing_keywords": score_after_result["missing_keywords"],
+                "suggestions": [
+                    "Add missing keywords naturally.",
+                    "Structure experience with bullet points.",
+                    "Keep the tone factual and ATS-friendly.",
+                ],
+                "created_at": datetime.utcnow(),
+            }
+            analysis_result = await db.analyses.insert_one(analysis_doc)
+            analysis_id = str(analysis_result.inserted_id)
+
+            if payload.async_queue and optimize_resume_task is not None:
+                try:
+                    optimize_resume_task.delay(
+                        payload.resume_text,
+                        payload.job_description,
+                        resume_id,
+                        job_id,
+                        analysis_id,
+                    )
+                except Exception:
+                    logger.warning("Failed to enqueue background optimization job")
+        except Exception as exc:
+            logger.warning("MongoDB unavailable, returning result without persistence: %s", exc)
 
     return OptimizeResponse(
         score_before=score_before_result["score"],
         score_after=score_after_result["score"],
+        matched_keywords=score_after_result["matched_keywords"],
         missing_keywords=score_after_result["missing_keywords"],
         optimized_resume=optimized_resume,
         version_id=resume_doc["optimized_versions"][0]["version_id"],
-        job_id=str(job_result.inserted_id),
-        resume_id=str(resume_result.inserted_id),
+        job_id=job_id,
+        resume_id=resume_id,
     )
 
 

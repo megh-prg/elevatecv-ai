@@ -29,10 +29,13 @@ async def startup_event() -> None:
     app.state.mongo = MongoDB()
     try:
         await app.state.mongo.connect()
+        # Explicitly ping to verify connection (AsyncIOMotorClient is lazy)
+        await app.state.mongo.client.admin.command('ping')
         logger.info("Connected to MongoDB")
     except Exception as e:
         logger.error(f"Could not connect to MongoDB: {e}")
-        # MongoDB is likely required for most operations, but we'll log the error.
+        # If ping fails, we still have the mongo object, but its db will fail on queries.
+
 
     try:
         app.state.redis = get_redis_client()
